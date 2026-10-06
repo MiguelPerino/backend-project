@@ -33,7 +33,8 @@ def products():
     cursor = connection.cursor()
 
     search = request.args.get("search") #QUERY PARAMETER - diferentes infos na hora da req
-
+    #request recebe o fetch(requisicao) do js, o .args é onde pega o query parameters
+    
     if search:
         cursor.execute(
             """
