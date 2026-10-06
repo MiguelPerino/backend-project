@@ -43,7 +43,7 @@ def products():
             (f"%{search}%",)
         )
     else:
-        cursor.execute("SELECT * FROM products")
+        cursor.execute("SELECT * FROM products LIMIT 3")
 
     products = cursor.fetchall()
     products = [
@@ -63,24 +63,24 @@ def products():
         "products": products
     }
 
-@app.route("/product/<int:id>")
-def search(id):
-    connection = get_connection()
-    cursor = connection.cursor()
+# @app.route("/product/<int:id>")
+# def search(id):
+#     connection = get_connection()
+#     cursor = connection.cursor()
 
-    cursor.execute(
-        "SELECT * FROM products WHERE id = %s",
-        (id,)
-    )
+#     cursor.execute(
+#         "SELECT * FROM products WHERE id = %s",
+#         (id,)
+#     )
 
-    product = cursor.fetchall()
+#     product = cursor.fetchall()
 
-    cursor.close()
-    connection.close()
+#     cursor.close()
+#     connection.close()
 
-    return {
-        "product": product
-    }
+#     return {
+#         "product": product
+#     }
     
     
 if __name__ == "__main__":
