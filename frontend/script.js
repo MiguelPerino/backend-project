@@ -2,7 +2,7 @@ async function loadProducts(search = "") {
     let url = "http://localhost:5000/products";
 
     if (search) {
-        url += `?search=${encodeURIComponent(search)}`;
+        url += `?search=${encodeURIComponent(search)}`; //codifica o texto pra ser colocado dentro da url, por exemplo acento e espaço
     }
 
     const response = await fetch(url);
