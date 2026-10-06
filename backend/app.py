@@ -1,5 +1,5 @@
 from flask import Flask
-import psycopg
+import psycopg	#lib pra conectar com postgre
 
 app = Flask(__name__)
 
@@ -26,7 +26,39 @@ def products():
     #tem que ter a connection com o banco, o cursor, e ai  a gente pode fazer qualquer acao
     #da pra dar o select all, depoiis lembrar de fechar o cursor e a connection e retornar o prodfucts
     #depois disso salva o arquivo e roda novamnete o docker compose up -d --build
-	pass
+	connection = get_connection()
+	cursor = connection.cursor()
+ 
+	cursor.execute("SELECT * FROM products")
+	
+	product = cursor.fetchall()
+	
+	cursor.close()
+	connection.close()
 
+	return {
+		"product": product
+	}
+
+@app.route("/product/<int:id>")
+def search(id):
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        "SELECT * FROM products WHERE id = %s",
+        (id,)
+    )
+
+    product = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return {
+        "product": product
+    }
+    
+    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
