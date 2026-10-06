@@ -29,6 +29,15 @@ async function loadProducts(search = "") {
         } else if (product.name === "Tilápia") {
             image = "imgs/tilapa.png";
         }
+        else if (product.name === "Pacu") {
+            image = "imgs/pacu.jpeg";
+        }
+        else if (product.name === "Piranha") {
+            image = "imgs/piranha.jpeg";
+        }
+        else if (product.name === "Traíra") {
+            image = "imgs/traira.jpeg";
+        }
 
         card.innerHTML = `
             <img src="${image}" alt="${product.name}" class="product-image">
