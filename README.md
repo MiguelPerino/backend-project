@@ -90,4 +90,4 @@ A tabela `products` é criada automaticamente na primeira execução pelo `datab
 
 ## Autor
 
-Miguel Perino
+Miguel Perino | João Pedro Magri
