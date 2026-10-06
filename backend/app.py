@@ -1,8 +1,10 @@
-from flask import Flask
-import psycopg	#lib pra conectar com postgre
+from flask import Flask, request
+from flask_cors import CORS
+import psycopg#lib pra conectar com postgre
 
 app = Flask(__name__)
 
+CORS(app)   #permite requisicao de outras origens, isso vai servir pra comunicar com o frontend
 
 def get_connection():
     #importante aqui o host=db, por que la no docker compose o servico do postgre chama db
@@ -11,7 +13,7 @@ def get_connection():
         host="db",
         dbname="ecommerce",
         user="postgres",
-        password="postgres"
+        password="postgres",
     )
 
 
@@ -19,26 +21,47 @@ def get_connection():
 def home():
     return {"message": "funcionando"}
 
-
+    
 #aqui vamos fazer a rota pro flask consultar o bd podemos chamar pelo localhost:5000/products
 @app.route("/products")
 def products():
     #tem que ter a connection com o banco, o cursor, e ai  a gente pode fazer qualquer acao
     #da pra dar o select all, depoiis lembrar de fechar o cursor e a connection e retornar o prodfucts
     #depois disso salva o arquivo e roda novamnete o docker compose up -d --build
-	connection = get_connection()
-	cursor = connection.cursor()
- 
-	cursor.execute("SELECT * FROM products")
-	
-	product = cursor.fetchall()
-	
-	cursor.close()
-	connection.close()
 
-	return {
-		"product": product
-	}
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    search = request.args.get("search") #QUERY PARAMETER - diferentes infos na hora da req
+
+    if search:
+        cursor.execute(
+            """
+            SELECT * FROM products
+            WHERE name ILIKE %s
+            """,
+            (f"%{search}%",)
+        )
+    else:
+        cursor.execute("SELECT * FROM products")
+
+    products = cursor.fetchall()
+    products = [
+        {
+            "id": product[0],
+            "name": product[1],
+            "description": product[2],
+            "price": product[3],
+            "stock": product[4]
+        }
+        for product in products
+    ]
+    cursor.close()
+    connection.close()
+
+    return {
+        "products": products
+    }
 
 @app.route("/product/<int:id>")
 def search(id):
