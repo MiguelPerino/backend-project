@@ -1,10 +1,11 @@
-async function loadProducts(search = "") {
+async function loadProducts(search = "") { //search parametro que vai vir da pesquisa
     let url = "http://localhost:5000/products";
 
     if (search) {
         url += `?search=${encodeURIComponent(search)}`; //codifica o texto pra ser colocado dentro da url, por exemplo acento e espaço
-    }
-
+    }                       
+    
+    //manda requisicao pro flask
     const response = await fetch(url);
     const data = await response.json();
 
@@ -61,7 +62,7 @@ const searchInput = document.getElementById("search-input");
 
 
 searchButton.addEventListener("click", () => {
-    loadProducts(searchInput.value);
+    loadProducts(searchInput.value); //aqui traz o valor da pesquisa do usuario
 });
 
 
