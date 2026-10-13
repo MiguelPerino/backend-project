@@ -50,6 +50,8 @@ async function loadProducts(search = "") { //search parametro que vai vir da pes
             <strong>R$ ${product.price}</strong>
 
             <span>Estoque: ${product.stock}</span>
+
+            <span class="seller-name">Vendedor: ${product.seller}</span>
         `;
 
         productGrid.appendChild(card);

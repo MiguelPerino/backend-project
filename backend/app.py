@@ -16,73 +16,70 @@ def get_connection():
         password="postgres",
     )
 
-
+#aqui vamos fazer a rota pro flask consultar o bd podemos chamar pelo localhost:5000/products
 @app.route("/")
 def home():
     return {"message": "funcionando"}
 
-    
-#aqui vamos fazer a rota pro flask consultar o bd podemos chamar pelo localhost:5000/products
+
 @app.route("/products")
 def products():
-    #tem que ter a connection com o banco, o cursor, e ai  a gente pode fazer qualquer acao
-    #da pra dar o select all, depoiis lembrar de fechar o cursor e a connection e retornar o prodfucts
-    #depois disso salva o arquivo e roda novamnete o docker compose up -d --build
-
     connection = get_connection()
     cursor = connection.cursor()
 
-    search = request.args.get("search") #QUERY PARAMETER - diferentes infos na hora da req
-    #request recebe o fetch(requisicao) do js, o .args é onde pega o query parameters
-    
+    search = request.args.get("search", "")
+
     if search:
         cursor.execute(
             """
-            SELECT * FROM products
-            WHERE name ILIKE %s
+            SELECT products.id,
+                   products.name,
+                   products.description,
+                   products.price,
+                   products.stock,
+                   users.name AS seller
+            FROM products
+            JOIN users ON products.user_id = users.id
+            WHERE products.name ILIKE %s
+               OR users.name ILIKE %s
+            ORDER BY products.id
             """,
-            (f"%{search}%",)
+            (f"%{search}%", f"%{search}%")
         )
     else:
-        cursor.execute("SELECT * FROM products LIMIT 3")
+        cursor.execute(
+            """
+            SELECT products.id,
+                   products.name,
+                   products.description,
+                   products.price,
+                   products.stock,
+                   users.name AS seller
+            FROM products
+            JOIN users ON products.user_id = users.id
+            ORDER BY products.id
+            """
+        )
 
-    products = cursor.fetchall()
+    rows = cursor.fetchall()
+
     products = [
         {
-            "id": product[0],
-            "name": product[1],
-            "description": product[2],
-            "price": product[3],
-            "stock": product[4]
+            "id": row[0],
+            "name": row[1],
+            "description": row[2],
+            "price": str(row[3]),
+            "stock": row[4],
+            "seller": row[5]
         }
-        for product in products
+        for row in rows
     ]
+
     cursor.close()
     connection.close()
 
-    return {
-        "products": products
-    }
+    return {"products": products}
 
-# @app.route("/product/<int:id>")
-# def search(id):
-#     connection = get_connection()
-#     cursor = connection.cursor()
 
-#     cursor.execute(
-#         "SELECT * FROM products WHERE id = %s",
-#         (id,)
-#     )
-
-#     product = cursor.fetchall()
-
-#     cursor.close()
-#     connection.close()
-
-#     return {
-#         "product": product
-#     }
-    
-    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
